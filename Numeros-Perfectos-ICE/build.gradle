@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id "com.zeroc.gradle.ice-builder.slice" version "1.5.0" apply false
+}
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.zeroc.gradle.ice-builder.slice'
+    slice {
+        java {
+            files = [file('../slice/App.ice')]
+        }
+    }
+
+
+    group = 'org.example'
+    version = '1.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation 'com.zeroc:ice:3.7.4'
+        testImplementation platform('org.junit:junit-bom:5.10.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+    }
+
+    tasks.register("copyIceJar", Copy) {
+        from(configurations.runtimeClasspath)
+        include('ice-3.7.4.jar')
+        into(layout.buildDirectory.dir("libs"))
+    }
+
+    tasks.named("jar") {
+        dependsOn("copyIceJar")
+    }
+
+    jar.dependsOn copyIceJar
+
+    jar {
+        manifest {
+            attributes('Main-Class': project.name.capitalize(),
+                    'Class-Path': configurations.runtimeClasspath.files.collect { "${it.name}" }.join(' ')
+            )
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}

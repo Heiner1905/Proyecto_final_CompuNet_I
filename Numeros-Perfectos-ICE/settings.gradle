@@ -1,0 +1,4 @@
+rootProject.name = 'Numeros-Perfectos-ICE'
+include 'worker'
+include 'master'
+include 'client'
