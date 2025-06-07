@@ -34,6 +34,11 @@ public class PublisherI implements Demo.Publisher {
     }
 
     @Override
+    public void reportResult(int jobId, int[] results, Current current) {
+
+    }
+
+    @Override
     public void startJob(int numWorkers, int min, int max, Current current) {
         workersEsperados = numWorkers;
         System.out.println("Esperando a que se conecten los " + numWorkers + " workers...");
@@ -108,7 +113,6 @@ public class PublisherI implements Demo.Publisher {
         }
     }
 
-    @Override
     public void notifySubscriber(int id, String msg) {
         SubscriberPrx subscriber = subscribers.get(id);
         if (subscriber != null) {
@@ -118,7 +122,7 @@ public class PublisherI implements Demo.Publisher {
         }
     }
 
-    public int getSubscribersNum() {
+    public int getSubscribersNum(Current current) {
         return subscribers.size();
     }
 }

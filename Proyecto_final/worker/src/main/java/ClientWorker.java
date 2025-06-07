@@ -1,3 +1,6 @@
+import Demo.PublisherPrx;
+import Demo.Subscriber;
+import Demo.SubscriberPrx;
 import com.zeroc.Ice.*;
 
 
@@ -24,10 +27,8 @@ public class ClientWorker {
             if(publisher == null){
                 throw new Error("Bat Ice Proxy");
             }
-            publisher.addSubscriber(publisher.getSubscribersNum(), subscriberPrx);
+            publisher.addSubscriber(subscriberPrx);
             communicator.waitForShutdown();
-        } catch(IOException e) {
-            e.printStackTrace();
         }
     }
 }
