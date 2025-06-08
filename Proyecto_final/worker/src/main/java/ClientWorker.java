@@ -16,7 +16,9 @@ public class ClientWorker {
 
             ObjectAdapter adapter = communicator.createObjectAdapter("Subscriber");
 
-            ObjectPrx proxies = adapter.add(subscriber,Util.stringToIdentity("NN"));
+            String workerId = java.util.UUID.randomUUID().toString();
+
+            ObjectPrx proxies = adapter.add(subscriber,Util.stringToIdentity(workerId));
 
             adapter.activate();
 

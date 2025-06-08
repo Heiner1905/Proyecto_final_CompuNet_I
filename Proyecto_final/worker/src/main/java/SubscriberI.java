@@ -1,10 +1,23 @@
 import com.zeroc.Ice.Current;
 
+import java.util.concurrent.*;
+
 import java.util.ArrayList;
 
 public class SubscriberI implements Demo.Subscriber {
 
     private int id = -1; // ID asignado dinámicamente por Publisher
+
+    // Numero de hilos que se van a usar para ejecutar las tareas en paralelo, es constante para asegurar la
+    // consistencia del valor durante la ejecución del programa
+    private static final int NUM_THREADS = 4;
+
+    private final ExecutorService executor;
+
+    public SubscriberI(){
+        this.executor = Executors.newFixedThreadPool(NUM_THREADS);
+    }
+
 
     public void setId(int id) {
         this.id = id;
@@ -14,18 +27,12 @@ public class SubscriberI implements Demo.Subscriber {
     @Override
     public int[] calculatePerfectNum(int minNum, int maxNum, Current current) {
         int[] perfectNum;
-        if (maxNum > minNum) {
-            ArrayList<Integer> nums = calculate(minNum, maxNum);
-            perfectNum = new int[nums.size()];
-            for (int i = 0; i < nums.size(); i++) {
-                perfectNum[i] = nums.get(i);
-            }
-        } else {
-            ArrayList<Integer> nums = calculate(maxNum, minNum);
-            perfectNum = new int[nums.size()];
-            for (int i = 0; i < nums.size(); i++) {
-                perfectNum[i] = nums.get(i);
-            }
+        int min = Math.min(minNum, maxNum);
+        int max = Math.max(minNum, maxNum);
+        ArrayList<Integer> nums = calculate(min, max);
+        perfectNum = new int[nums.size()];
+        for (int i = 0; i < nums.size(); i++) {
+            perfectNum[i] = nums.get(i);
         }
         return perfectNum;
     }
@@ -51,5 +58,22 @@ public class SubscriberI implements Demo.Subscriber {
     @Override
     public void onUpdate(String msg, Current current) {
         System.out.println("Mensaje recibido por Subscriber " + id + ": " + msg);
+    }
+
+    // Esta funcion asegura que se apaguen los hilos de forma segura despues de un tiempo especificado
+
+    public void shutdown() {
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    System.err.println("ExecutorService no se pudo cerrar correctamente.");
+                }
+            }
+        } catch (InterruptedException ie) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }

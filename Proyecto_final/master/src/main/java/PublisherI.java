@@ -29,17 +29,15 @@ public class PublisherI implements Demo.Publisher {
 
     @Override
     public synchronized void removeSubscriber(int id, Current current) {
+        if (!subscribers.containsKey(id)) {
+            throw new IllegalArgumentException("No existe subscriber con ID: " + id);
+        }
         subscribers.remove(id);
         System.out.println("Se ha eliminado el subscriber: " + id);
     }
 
-    @Override
-    public void reportResult(int jobId, int[] results, Current current) {
 
-    }
-
-    @Override
-    public void startJob(int numWorkers, int min, int max, Current current) {
+    public CompletableFuture<int[]> startJob(int numWorkers, int min, int max) {
         workersEsperados = numWorkers;
         System.out.println("Esperando a que se conecten los " + numWorkers + " workers...");
 
@@ -51,7 +49,7 @@ public class PublisherI implements Demo.Publisher {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     System.err.println("startJob interrumpido: " + e.getMessage());
-                    return;
+                    return CompletableFuture.failedFuture(e);
                 }
             }
         }
@@ -74,15 +72,15 @@ public class PublisherI implements Demo.Publisher {
                 future = proxy.calculatePerfectNumAsync(finalMin, finalMax);
             } catch (Exception e) {
                 System.err.println("Error con worker al llamar calculatePerfectNumAsync: " + e.getMessage());
-                future = new CompletableFuture<>();
+                future = CompletableFuture.failedFuture(e);
             }
 
             futures.add(future);
             currentMin = currentMax;
         }
 
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenRun(() -> {
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> {
                     List<Integer> allResults = new ArrayList<>();
                     for (CompletableFuture<int[]> f : futures) {
                         try {
@@ -94,33 +92,13 @@ public class PublisherI implements Demo.Publisher {
                             System.err.println("Error recolectando resultado individual: " + e.getMessage());
                         }
                     }
-
-                    int[] resultArray = allResults.stream().mapToInt(i -> i).toArray();
-                    receiveResults(resultArray, current);
-                })
-                .exceptionally(ex -> {
-                    System.err.println("Error al recolectar resultados: " + ex.getMessage());
-                    return null;
+                    return allResults.stream().mapToInt(i -> i).toArray();
                 });
     }
 
-    @Override
-    public void receiveResults(int[] results, Current current) {
-        if (results.length == 0) {
-            System.out.println("No se encontraron números perfectos.");
-        } else {
-            System.out.println("Números perfectos encontrados: " + Arrays.toString(results));
-        }
-    }
 
-    public void notifySubscriber(int id, String msg) {
-        SubscriberPrx subscriber = subscribers.get(id);
-        if (subscriber != null) {
-            System.out.println("pollo");
-        } else {
-            System.out.println("Subscriber con ID " + id + " no existe.");
-        }
-    }
+
+
 
     public int getSubscribersNum(Current current) {
         return subscribers.size();
