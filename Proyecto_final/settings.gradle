@@ -1,4 +1,12 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral() // Asegúrate de que esta línea esté presente
+    }
+}
+
 rootProject.name = 'Proyecto_final'
 include 'master'
 include 'worker'
 include 'client'
+

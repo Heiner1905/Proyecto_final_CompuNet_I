@@ -10,7 +10,7 @@ public class Server {
             ObjectAdapter adapter = communicator.createObjectAdapter("services");
 
             PublisherI publisher = new PublisherI();
-            adapter.add(publisher, Util.stringToIdentity("Publisher"));
+            adapter.add(publisher, Util.stringToIdentity("publisher"));
             adapter.activate();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));

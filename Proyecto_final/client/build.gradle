@@ -1,0 +1,58 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0' // ✅ Usar el plugin de JavaFX
+}
+
+// ✅ Declara la versión de JavaFX globalmente para este subproyecto
+javafx {
+    version = "17" // O la versión que estés usando
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+dependencies {
+    // Estas dependencias ya no son necesarias si usas el plugin de JavaFX
+    // implementation "org.openjfx:javafx-controls:${javafxVersion}"
+    // implementation "org.openjfx:javafx-fxml:${javafxVersion}"
+
+    // runtimeOnly "org.openjfx:javafx-controls:${javafxVersion}:win"
+    // runtimeOnly "org.openjfx:javafx-fxml:${javafxVersion}:win"
+
+    // Asegúrate de que tu subproyecto 'client' tenga acceso a las clases Ice
+    // El 'slice' plugin del padre ya genera el código, pero las dependencias de runtime son necesarias
+    implementation 'com.zeroc:ice:3.7.10' // Asegúrate de tener esta dependencia aquí también
+
+    // Dependencias de tu propio proyecto si las tienes (ej. el código Slice generado por Ice)
+    // Si tu código Slice se genera en un módulo aparte, tendrías que referenciarlo así:
+    // implementation project(':slice-module-name')
+    // O si el subproyecto client es el que contiene el Slice, ya estará disponible.
+    // Esto dependerá de cómo tengas estructurados tus proyectos Slice.
+    // Asumo que 'Demo' está en tu classpath gracias a la configuración del root build.gradle
+}
+
+application {
+    mainClass = 'client.MainApp' // ✅ Asegúrate de que el mainClass apunte a tu clase principal de JavaFX
+}
+
+run {
+    // IMPORTANTE: Debes reemplazar esta ruta con la RUTA EXACTA
+    // al directorio 'lib' dentro de tu SDK de JavaFX 17 descargado.
+    // Ejemplo para Windows: "C:/Users/David/Downloads/openjfx-17.0.10_windows-x64_bin-sdk/javafx-sdk-17.0.10/lib"
+    // Asegúrate de la versión exacta de tu descarga (ej. 17.0.10, 17.0.11, etc.)
+    def javafxSdkLibPath = "C:\\Users\\David\\Downloads\\openjfx-17.0.15_windows-x64_bin-sdk\\javafx-sdk-17.0.15\\lib" // <<< ¡CAMBIA ESTA RUTA!
+
+    jvmArgs = [
+            '--module-path', javafxSdkLibPath,
+            '--add-modules', 'javafx.controls,javafx.fxml'
+    ]
+
+    // Si tu proyecto tiene otros JARs en el classpath que también deberían ir en el module-path
+    // (poco común para un cliente simple sin módulo-info.java), podrías añadir:
+    // jvmArgs += ['--module-path', classpath.asPath]
+    // Pero el problema casi siempre está en la ruta del SDK de JavaFX.
+}

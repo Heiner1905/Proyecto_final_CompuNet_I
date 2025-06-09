@@ -6,7 +6,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'com.zeroc.gradle.ice-builder.slice'
     slice {
-        iceHome = file('/opt/homebrew')
         java {
             files = [file('../slice/App.ice')]
         }
@@ -20,13 +19,19 @@ subprojects {
         mavenCentral()
     }
 
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
     dependencies {
         implementation 'com.zeroc:ice:3.7.10'
         testImplementation platform('org.junit:junit-bom:5.10.0')
         testImplementation 'org.junit.jupiter:junit-jupiter'
     }
 
-    tasks.register("copyIceJar", Copy) {
+    /*tasks.register("copyIceJar", Copy) {
         from(configurations.runtimeClasspath)
         include('ice-3.7.10.jar')
         into(layout.buildDirectory.dir("libs"))
@@ -44,7 +49,7 @@ subprojects {
                     'Class-Path': configurations.runtimeClasspath.files.collect { "${it.name}" }.join(' ')
             )
         }
-    }
+    }*/
 
     test {
         useJUnitPlatform()

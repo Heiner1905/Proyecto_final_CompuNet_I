@@ -5,10 +5,11 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../../../Gradle/gradle-8.6" />
+        <option name="gradleHome" value="$USER_HOME$/Gradle/gradle-8.6" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/client" />
             <option value="$PROJECT_DIR$/master" />
             <option value="$PROJECT_DIR$/worker" />
           </set>
