@@ -10,5 +10,6 @@ module Demo {
         int getSubscribersNum();
         int addSubscriber(Subscriber* o);
         void removeSubscriber(int id);
+        IntSeq startJob(int numWorkers, int min, int max);
     }
 }

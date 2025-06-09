@@ -25,22 +25,15 @@ public class Server {
                 }
 
                 String[] command = msj.split("::", 3);
-                try {
+
                     int numOfWorkers = Integer.parseInt(command[0]);
                     int min = Integer.parseInt(command[1]);
                     int max = Integer.parseInt(command[2]);
-                    publisher.startJob(numOfWorkers, min, max).thenAccept(result -> {
-                        System.out.println("Números perfectos encontrados:");
-                        for (int n : result) {
-                            System.out.println(n);
-                        }
-                    }).exceptionally(ex -> {
-                        System.err.println("calculus failed: " + ex.getMessage());
-                        return null;
-                    });
-                } catch (NumberFormatException e) {
-                    System.out.println("ID debe ser un número entero.");
-                }
+                    int[] result = publisher.startJobLocal(numOfWorkers, min, max);
+                    System.out.println("Números perfectos encontrados:");
+                    for (int n : result) {
+                        System.out.println(n);
+                    }
             }
 
             communicator.waitForShutdown();

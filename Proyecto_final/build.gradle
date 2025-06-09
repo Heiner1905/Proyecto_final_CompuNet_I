@@ -6,7 +6,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'com.zeroc.gradle.ice-builder.slice'
     slice {
-        iceHome = file('C:\\Program Files\\ZeroC\\Ice-3.7.10')
+        iceHome = file('/opt/homebrew')
         java {
             files = [file('../slice/App.ice')]
         }

@@ -1,3 +1,4 @@
 rootProject.name = 'Proyecto_final'
 include 'master'
 include 'worker'
+include 'client'

@@ -36,8 +36,7 @@ public class PublisherI implements Demo.Publisher {
         System.out.println("Se ha eliminado el subscriber: " + id);
     }
 
-
-    public CompletableFuture<int[]> startJob(int numWorkers, int min, int max) {
+    public int[] startJobLocal(int numWorkers, int min, int max) {
         workersEsperados = numWorkers;
         System.out.println("Esperando a que se conecten los " + numWorkers + " workers...");
 
@@ -49,7 +48,7 @@ public class PublisherI implements Demo.Publisher {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     System.err.println("startJob interrumpido: " + e.getMessage());
-                    return CompletableFuture.failedFuture(e);
+                    return new int[0];
                 }
             }
         }
@@ -67,33 +66,34 @@ public class PublisherI implements Demo.Publisher {
             int finalMin = currentMin;
             int finalMax = currentMax;
 
-            CompletableFuture<int[]> future;
             try {
-                future = proxy.calculatePerfectNumAsync(finalMin, finalMax);
+                futures.add(proxy.calculatePerfectNumAsync(finalMin, finalMax));
             } catch (Exception e) {
-                System.err.println("Error con worker al llamar calculatePerfectNumAsync: " + e.getMessage());
-                future = CompletableFuture.failedFuture(e);
+                System.err.println("Error con worker: " + e.getMessage());
             }
 
-            futures.add(future);
             currentMin = currentMax;
         }
 
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenApply(v -> {
-                    List<Integer> allResults = new ArrayList<>();
-                    for (CompletableFuture<int[]> f : futures) {
-                        try {
-                            int[] result = f.join();
-                            for (int n : result) {
-                                allResults.add(n);
-                            }
-                        } catch (Exception e) {
-                            System.err.println("Error recolectando resultado individual: " + e.getMessage());
-                        }
-                    }
-                    return allResults.stream().mapToInt(i -> i).toArray();
-                });
+        // Bloqueamos y recolectamos todos los resultados
+        List<Integer> allResults = new ArrayList<>();
+        for (CompletableFuture<int[]> f : futures) {
+            try {
+                int[] result = f.join();
+                for (int n : result) {
+                    allResults.add(n);
+                }
+            } catch (Exception e) {
+                System.err.println("Error recolectando resultado: " + e.getMessage());
+            }
+        }
+
+        return allResults.stream().mapToInt(i -> i).toArray();
+    }
+
+    @Override
+    public int[] startJob(int numWorkers, int min, int max, Current current) {
+        return startJobLocal(numWorkers, min, max);
     }
 
 
