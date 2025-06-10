@@ -1,12 +1,6 @@
 import Demo.PublisherPrx;
-import Demo.Subscriber;
 import Demo.SubscriberPrx;
 import com.zeroc.Ice.*;
-
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Clase principal para la aplicación del Worker.

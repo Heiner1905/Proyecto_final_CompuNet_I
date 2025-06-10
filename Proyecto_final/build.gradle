@@ -21,7 +21,7 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+            languageVersion = JavaLanguageVersion.of(11)
         }
     }
 
@@ -31,25 +31,32 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter'
     }
 
-    /*tasks.register("copyIceJar", Copy) {
-        from(configurations.runtimeClasspath)
-        include('ice-3.7.10.jar')
-        into(layout.buildDirectory.dir("libs"))
-    }
-
-    tasks.named("jar") {
-        dependsOn("copyIceJar")
-    }
-
-    jar.dependsOn copyIceJar
-
-    jar {
-        manifest {
-            attributes('Main-Class': project.name.capitalize(),
-                    'Class-Path': configurations.runtimeClasspath.files.collect { "${it.name}" }.join(' ')
-            )
+    if (!project.name.equals("client")) {
+        // Registra una tarea para copiar el JAR de Ice a la carpeta de dependencias del JAR ejecutable
+        tasks.register("copyIceJar", Copy) {
+            from(configurations.runtimeClasspath)
+            include('ice-3.7.10.jar') // Solo copia el JAR de Ice runtime
+            into(layout.buildDirectory.dir("libs")) // Copia a 'build/libs' del módulo
         }
-    }*/
+
+        // Asegura que la tarea 'jar' dependa de 'copyIceJar'
+        tasks.named("jar") {
+            dependsOn("copyIceJar")
+        }
+
+        // Configuración del manifiesto para que el JAR sea ejecutable
+        jar {
+            manifest {
+                attributes(
+                        'Main-Class': // Define la clase principal para cada módulo
+                                project.name.equals("master") ? 'Server' : // Si es el módulo 'master', la clase es 'Server'
+                                        project.name.equals("worker") ? 'ClientWorker' : // Si es el módulo 'worker', la clase es 'ClientWorker'
+                                                null, // Para otros módulos (aunque estamos en un 'if' que excluye 'client')
+                        'Class-Path': configurations.runtimeClasspath.files.collect { "${it.name}" }.join(' ') // Lista de JARs en el classpath
+                )
+            }
+        }
+    }
 
     test {
         useJUnitPlatform()
