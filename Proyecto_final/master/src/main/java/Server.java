@@ -22,6 +22,7 @@ public class Server {
             // Activa el adaptador, haciendo que el Maestro comience a escuchar peticiones.
             adapter.activate();
 
+            System.out.println("Servidor activado. Esperando trabajadores");
             // Asegura que el ExecutorService del Maestro y el Communicator de ICE se apaguen limpiamente
             // cuando la JVM se cierra (ej. por Ctrl+C o salida de programa).
             final PublisherI finalPublisher = publisher;

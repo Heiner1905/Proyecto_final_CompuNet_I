@@ -29,5 +29,28 @@ run {
             '--module-path', javafxSdkLibPath,
             '--add-modules', 'javafx.controls,javafx.fxml'
     ]
+}
 
+task consoleJar(type: Jar) {
+    // Nombre del JAR generado para el cliente de consola
+    archiveBaseName.set('client-console')
+    archiveClassifier.set('') // Puedes usar 'console' si quieres, ej: client-console-1.0-SNAPSHOT-console.jar
+
+    // Incluye las clases compiladas del módulo 'client'
+    from sourceSets.main.output
+
+    // Configura el manifiesto para el JAR ejecutable de consola
+    manifest {
+        attributes 'Main-Class': 'Client', // 'Client' porque Client.java está en el paquete por defecto
+                'Class-Path': configurations.runtimeClasspath.files.collect { "libs/${it.getName()}" }.join(' ')
+        // Las dependencias estarán en una subcarpeta 'libs/'
+    }
+
+    doLast {
+        copy {
+            from configurations.runtimeClasspath
+            into "${archiveFile.get().getAsFile().parentFile}/libs"
+            // Copia a la misma carpeta que el JAR, dentro de 'libs'
+        }
+    }
 }
