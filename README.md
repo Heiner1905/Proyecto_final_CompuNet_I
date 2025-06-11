@@ -105,8 +105,9 @@ gradle build
 
 ### 4. Cliente (Consola):
 
-* **(Alternativa al cliente GUI):** Abra una nueva terminal.Abra una terminal en la PC del Cliente. (Puede ser la misma del Maestro)
-* Ejecute: ```java -jar client/build/libs/client-1.0-SNAPSHOT.jar```
+* **(Alternativa al cliente GUI):** Abra una terminal en la PC del Cliente. (Puede ser la misma del Maestro)
+* Ejecute: ``` ./gradlew :client:consoleJar``` para crear el jar del cliente
+* Ejecute: ```java -jar client/build/libs/client-console-1.0-SNAPSHOT.jar```
 * **Interacción:** En la consola, debe digitar tres valores para la ejecución del programa. El primer valor que se ingresa es el numero de workers esperados para la ejecución, los siguientes dos valores son el rango en el cual se quiere buscar los numeros perfectos. 
 
 ## Notas importantes:
