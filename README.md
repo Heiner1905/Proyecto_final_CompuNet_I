@@ -17,6 +17,12 @@ Dada esta alta complejidad, este problema es un candidato ideal para la **comput
 
 ### Diseño del Modelo Cliente-Maestro-Trabajadores:
 
+<p align="center">
+  <img src="Picture1.png" alt="Diagrama de arquitectura del sistema" width="400"/>
+  <br>
+  <em>Figura 1: Esquema de diseño del modelo cliente-maestro-trabajadores</em>
+</p>
+
 El sistema se organiza bajo una arquitectura **Cliente-Maestro-Trabajadores (Master-Workers)**, facilitando la distribución eficiente de la carga computacional y la escalabilidad.
 
 * **Cliente (GUI / Consola):**
